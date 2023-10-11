@@ -1,0 +1,1 @@
+ALIGNMENT_FORMAT = 'clustal'
