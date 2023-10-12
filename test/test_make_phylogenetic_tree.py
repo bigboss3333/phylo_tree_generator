@@ -5,7 +5,7 @@ from unittest import TestCase
 
 from Bio import Phylo
 
-from phylogenetics.make_phylogenetic_tree import generate_tree, graph_tree
+from phylogenetics.make_phylogenetic_tree import generate_tree, graph_tree_object
 from test import TEST_DIR, DATA
 
 
@@ -24,7 +24,7 @@ class TestTreeGen(TestCase):
                     '                       ****                                                       ' + os.linesep)
             tree = generate_tree(alignment_path, True)
             Phylo.draw_ascii(tree)
-            graph_tree(tree)
+            graph_tree_object(tree)
 
     def test_vars(self):
         self.assertIn('phylo_tree_generator/test', str(TEST_DIR))
