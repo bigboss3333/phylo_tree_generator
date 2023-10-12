@@ -27,12 +27,10 @@ def generate_tree(alignment_path: pathlib.Path, rooted=True) -> Tree:
     tree_object = constructor.build_tree(alignment)
     tree_object.rooted = rooted
     tree_object.id = alignment_path.name.replace('.aln', '')
-    Phylo.write(tree_object, alignment_path.name.replace('.aln', '.xml'), "phyloxml")
-
     return tree_object
 
 
-def graph_tree(tree_object: Tree):
+def graph_tree_object(tree_object: Tree):
     """ Generates a phylogenetic tree plot from the tree object
 
     :param tree_object: Object created from alignment file mapping the distance between species
@@ -57,8 +55,23 @@ def parse_args() -> argparse.Namespace:
                         help='an alignment file used to generate phylogenetic tree, must be in clustal format')
     parser.add_argument('-r', '--rooted',
                         action='store_true')
+    parser.add_argument('-o', '--output', type=pathlib.Path,
+                        help='Directory to output tree files for tree generation')
 
     return parser.parse_args()
+
+
+def write_phylogenetic_tree_to_file(tree, output_path, format_extension):
+    # TODO we will want to add support for other formats
+    file = tree.id + format_extension
+    out_file = output_path / str(file)
+    Phylo.write(tree, out_file, "phyloxml")
+
+
+def read_phylogenetic_tree_from_file(file_path, file_format="phyloxml"):
+    tree = Phylo.read(file_path, file_format)
+    tree.ladderize()
+    Phylo.draw(tree)
 
 
 def main():
@@ -68,7 +81,13 @@ def main():
     """
     args = parse_args()
     tree = generate_tree(args.alignment, args.rooted)
-    graph_tree(tree)
+    if args.output is not None:
+        file_ext = '.xml'
+        write_phylogenetic_tree_to_file(tree, args.output, file_ext)
+        filename = tree.id + file_ext
+        read_phylogenetic_tree_from_file(args.output / filename)
+    else:
+        graph_tree_object(tree)
 
 
 if __name__ == '__main__':
